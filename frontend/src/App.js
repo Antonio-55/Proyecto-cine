@@ -1,62 +1,73 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PerfilPage from "./pages/PerfilPage";
-import RequireAuth from "./components/RequireAuth";
-import AdminSalasPage from "./pages/AdminSalasPage";
-import AdminPeliculasPage from "./pages/AdminPeliculasPage";
-import AdminFuncionesPage from "./pages/AdminFuncionesPage";
+import CarteleraPage from "./pages/CarteleraPage";
+import ReservarPage from "./pages/ReservarPage";
+import PagoPage from "./pages/PagoPage";
+
+// Admin
 import AdminPanelPage from "./pages/AdminPanelPage";
+import AdminFuncionesPage from "./pages/AdminFuncionesPage";
+import AdminPeliculasPage from "./pages/AdminPeliculasPage";
+import AdminSalasPage from "./pages/AdminSalasPage";
 
-
+// Protección por rol
+import RutaPrivada from "./components/RutaPrivada";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-        {/* Rutas protegidas */}
-        <Route path="/perfil" element={
-          <RequireAuth>
-            <PerfilPage />
-          </RequireAuth>
-        } />
-        <Route
-          path="/admin/salas"
-          element={
-            <RequireAuth>
-              <AdminSalasPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/admin/peliculas"
-          element={
-            <RequireAuth>
-              <AdminPeliculasPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/admin/funciones"
-          element={
-            <RequireAuth>
-              <AdminFuncionesPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <RequireAuth>
-              <AdminPanelPage />
-            </RequireAuth>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+      {/* Cliente */}
+      <Route path="/perfil" element={
+        <RutaPrivada rolPermitido="cliente">
+          <PerfilPage />
+        </RutaPrivada>
+      } />
+      <Route path="/cliente/cartelera" element={
+        <RutaPrivada rolPermitido="cliente">
+          <CarteleraPage />
+        </RutaPrivada>
+      } />
+      <Route path="/reservar/:id" element={
+        <RutaPrivada rolPermitido="cliente">
+          <ReservarPage />
+        </RutaPrivada>
+      } />
+      <Route path="/pago" element={
+        <RutaPrivada rolPermitido="cliente">
+          <PagoPage />
+        </RutaPrivada>
+      } />
+
+      {/* Admin */}
+      <Route path="/admin" element={
+        <RutaPrivada rolPermitido="administrador">
+          <AdminPanelPage />
+        </RutaPrivada>
+      } />
+      <Route path="/admin/funciones" element={
+        <RutaPrivada rolPermitido="administrador">
+          <AdminFuncionesPage />
+        </RutaPrivada>
+      } />
+      <Route path="/admin/peliculas" element={
+        <RutaPrivada rolPermitido="administrador">
+          <AdminPeliculasPage />
+        </RutaPrivada>
+      } />
+      <Route path="/admin/salas" element={
+        <RutaPrivada rolPermitido="administrador">
+          <AdminSalasPage />
+        </RutaPrivada>
+      } />
+
+      {/* Fallback */}
+      <Route path="*" element={<LoginPage />} />
+    </Routes>
   );
 }
 

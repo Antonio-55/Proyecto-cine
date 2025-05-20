@@ -16,23 +16,27 @@ router.get("/", (req, res) => {
     });
 });
 
-// ✅ Nueva ruta para obtener el perfil del usuario autenticado
-router.get("/perfil", authMiddleware, (req, res) => {
+//  Nueva ruta para obtener el perfil del usuario autenticado
+
+router.get("/perfil", authMiddleware, async (req, res) => {
+  try {
     const userId = req.user.id;
+    const [rows] = await db.query(
+      "SELECT nombre, email, rol FROM users WHERE idUsuarios = ?",
+      [userId]
+    );
 
-    db.query("SELECT nombre, email, rol FROM users WHERE idUsuarios = ?", [userId], (err, results) => {
-        if (err) {
-            console.error("Error al obtener perfil:", err);
-            return res.status(500).json({ message: "Error del servidor" });
-        }
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
 
-        if (results.length === 0) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
-
-        res.json(results[0]);
-    });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error al obtener perfil:", err);
+    res.status(500).json({ message: "Error del servidor" });
+  }
 });
+
 
 module.exports = router;
 

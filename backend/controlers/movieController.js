@@ -1,4 +1,5 @@
 const Movie = require("../models/Movie");
+const db = require("../config/db");
 
 exports.createMovie = async (req, res) => {
     const { titulo, poster_url, sinopsis, genero } = req.body;
@@ -42,4 +43,29 @@ exports.deleteMovie = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Error al eliminar película", error });
     }
+};
+
+exports.getFuncionesPorPelicula = async (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT f.idfunciones AS idFuncion, f.fecha, f.hora, s.nombre AS sala
+    FROM funciones f
+    JOIN salas s ON f.sala_idSalas = s.idSalas
+    WHERE f.pelicula_idPeliculas = ?
+    ORDER BY f.fecha, f.hora
+  `;
+
+  try {
+    const [funciones] = await db.query(sql, [id]);
+
+    if (funciones.length === 0) {
+      return res.status(404).json({ message: "No hay funciones para esta película" });
+    }
+
+    res.json(funciones);
+  } catch (error) {
+    console.error("Error al obtener funciones por película:", error);
+    res.status(500).json({ message: "Error del servidor", error });
+  }
 };

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createMovie, getMovies, deleteMovie } = require("../controlers/movieController");
+const { createMovie, getMovies, deleteMovie, getFuncionesPorPelicula } = require("../controlers/movieController");
 const authMiddleware = require("../middleware/authMiddleware");
 
 router.get("/", getMovies); // Pública
@@ -11,5 +11,6 @@ router.delete("/:id", authMiddleware, (req, res, next) => {
     }
     next();
 }, deleteMovie); // Solo admins
+router.get("/:id/funciones", getFuncionesPorPelicula); // Pública
 
 module.exports = router;

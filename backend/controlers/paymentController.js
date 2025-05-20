@@ -1,4 +1,6 @@
 const Payment = require("../models/Payment");
+const db = require("../config/db"); // ✅ importa la conexión
+
 
 exports.createPayment = async (req, res) => {
     const { reservacionId, monto, metodo_pago } = req.body;
@@ -14,6 +16,11 @@ exports.createPayment = async (req, res) => {
             monto,
             metodo: metodo_pago
         });
+        await db.query(
+            `UPDATE reservacion SET estado = 'pagado' WHERE idreservacion = ?`,
+            [reservacionId]
+        );
+
 
         res.status(201).json({ message: "Pago registrado exitosamente" });
     } catch (error) {

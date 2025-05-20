@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getPerfil, logout } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import { Box, Button, Typography } from "@mui/material";
+import palette from "../theme/palette";
 
 export default function PerfilPage() {
   const [user, setUser] = useState(null);
@@ -19,29 +21,48 @@ export default function PerfilPage() {
     navigate("/login");
   };
 
-  if (!user) return <p>Cargando perfil...</p>;
+  if (!user) return <Typography>Cargando perfil...</Typography>;
 
   return (
-    <div>
-      <h2>Perfil</h2>
-      <p><strong>Nombre:</strong> {user.nombre}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Rol:</strong> {user.rol}</p>
+    <Box p={4} sx={{ backgroundColor: palette.background, minHeight: "100vh" }}>
+      <Typography variant="h4" gutterBottom>
+        Perfil
+      </Typography>
 
-      <button onClick={handleLogout} style={{ marginTop: "15px" }}>
-        Cerrar sesión
-      </button>
+      <Typography><strong>Nombre:</strong> {user.nombre}</Typography>
+      <Typography><strong>Email:</strong> {user.email}</Typography>
+      <Typography><strong>Rol:</strong> {user.rol}</Typography>
 
-      {/* ✅ Solo visible si el rol es administrador */}
-      {user.rol === "administrador" && (
-        <div style={{ marginTop: "20px" }}>
-          <button onClick={() => navigate("/admin/salas")}>
-            Ir al panel de administración
-          </button>
-        </div>
+      <Box mt={3}>
+        <Button variant="outlined" color="error" onClick={handleLogout}>
+          Cerrar sesión
+        </Button>
+      </Box>
+
+      {/* Opciones según rol */}
+      {user.rol === "cliente" && (
+        <Box mt={4}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/cliente/cartelera")}
+          >
+            Ver Cartelera
+          </Button>
+        </Box>
       )}
-    </div>
+
+      {user.rol === "administrador" && (
+        <Box mt={4}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => navigate("/admin")}
+          >
+            Ir al panel de administración
+          </Button>
+        </Box>
+      )}
+    </Box>
   );
 }
-
-

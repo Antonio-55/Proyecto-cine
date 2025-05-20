@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { login } from "../services/authService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -29,6 +29,7 @@ export default function LoginPage() {
       const payload = JSON.parse(atob(token.split(".")[1]));
       const rol = payload.rol;
 
+      // Redirigir por rol
       if (rol === "administrador") {
         navigate("/admin");
       } else {
@@ -77,6 +78,13 @@ export default function LoginPage() {
             {mensaje}
           </Alert>
         )}
+
+        <Typography variant="body2" sx={{ mt: 3 }}>
+          ¿No tienes una cuenta?{" "}
+          <Link to="/register" style={{ color: "#1976D2", textDecoration: "none" }}>
+            Regístrate aquí
+          </Link>
+        </Typography>
       </Paper>
     </Container>
   );

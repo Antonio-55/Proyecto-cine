@@ -46,19 +46,25 @@ export default function AdminFuncionesPage() {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await crearFuncion({ fecha, hora, sala_idSalas: salaId, pelicula_idPeliculas: peliculaId });
-      const funcionesActualizadas = await obtenerFunciones();
-      setFunciones(funcionesActualizadas);
-      setFecha("");
-      setHora("");
-      setSalaId("");
-      setPeliculaId("");
-    } catch (error) {
+  e.preventDefault();
+  try {
+    await crearFuncion({ fecha, hora, sala_idSalas: salaId, pelicula_idPeliculas: peliculaId });
+    const funcionesActualizadas = await obtenerFunciones();
+    setFunciones(funcionesActualizadas);
+    setFecha("");
+    setHora("");
+    setSalaId("");
+    setPeliculaId("");
+  } catch (error) {
+    if (error.response && error.response.status === 409) {
+      alert("Ya existe una función en esa sala para esa fecha y hora.");
+    } else {
       console.error("Error al crear función:", error);
+      alert("Hubo un error al crear la función. Intenta nuevamente.");
     }
-  };
+  }
+};
+
 
   return (
     <div style={{ padding: 20 }}>
