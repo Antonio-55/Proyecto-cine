@@ -10,13 +10,14 @@ import {
   TableBody,
   Paper,
   Typography,
+  Box,
 } from "@mui/material";
 import {
   obtenerFunciones,
   crearFuncion,
   obtenerSalas,
   obtenerPeliculas,
-} from "../services/funcionService"; // Asegúrate de tener este archivo
+} from "../services/funcionService";
 
 export default function AdminFuncionesPage() {
   const [fecha, setFecha] = useState("");
@@ -28,127 +29,123 @@ export default function AdminFuncionesPage() {
   const [peliculas, setPeliculas] = useState([]);
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      try {
-        const [funcionesRes, salasRes, peliculasRes] = await Promise.all([
-          obtenerFunciones(),
-          obtenerSalas(),
-          obtenerPeliculas(),
-        ]);
-        setFunciones(funcionesRes);
-        setSalas(salasRes);
-        setPeliculas(peliculasRes);
-      } catch (error) {
-        console.error("Error al cargar datos:", error);
-      }
-    };
     cargarDatos();
   }, []);
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await crearFuncion({ fecha, hora, sala_idSalas: salaId, pelicula_idPeliculas: peliculaId });
-    const funcionesActualizadas = await obtenerFunciones();
-    setFunciones(funcionesActualizadas);
-    setFecha("");
-    setHora("");
-    setSalaId("");
-    setPeliculaId("");
-  } catch (error) {
-    if (error.response && error.response.status === 409) {
-      alert("Ya existe una función en esa sala para esa fecha y hora.");
-    } else {
-      console.error("Error al crear función:", error);
-      alert("Hubo un error al crear la función. Intenta nuevamente.");
-    }
-  }
-};
+  const cargarDatos = async () => {
+    const fun = await obtenerFunciones();
+    const sal = await obtenerSalas();
+    const pel = await obtenerPeliculas();
+    setFunciones(fun);
+    setSalas(sal);
+    setPeliculas(pel);
+  };
 
+  const handleCrear = async () => {
+    if (!fecha || !hora || !salaId || !peliculaId) {
+      alert("Completa todos los campos.");
+      return;
+    }
+
+    const nuevaFuncion = {
+      fecha,
+      hora,
+      sala_idSalas: salaId,
+      pelicula_idPeliculas: peliculaId,
+    };
+
+    const creada = await crearFuncion(nuevaFuncion);
+    if (creada) {
+      await cargarDatos();
+      setFecha("");
+      setHora("");
+      setSalaId("");
+      setPeliculaId("");
+    }
+  };
 
   return (
-    <div style={{ padding: 20 }}>
-      <Typography variant="h4" gutterBottom>
-        Administrar Funciones
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Fecha"
-          type="date"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-          margin="normal"
-          required
-        />
-        <TextField
-          label="Hora"
-          type="time"
-          value={hora}
-          onChange={(e) => setHora(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-          margin="normal"
-          required
-        />
-        <TextField
-          select
-          label="Sala"
-          value={salaId}
-          onChange={(e) => setSalaId(e.target.value)}
-          fullWidth
-          margin="normal"
-          required
-        >
-          {salas.map((sala) => (
-            <MenuItem key={sala.idSalas} value={sala.idSalas}>
-              {sala.nombre}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          select
-          label="Película"
-          value={peliculaId}
-          onChange={(e) => setPeliculaId(e.target.value)}
-          fullWidth
-          margin="normal"
-          required
-        >
-          {peliculas.map((p) => (
-            <MenuItem key={p.idPeliculas} value={p.idPeliculas}>
-              {p.titulo}
-            </MenuItem>
-          ))}
-        </TextField>
-        <Button variant="contained" type="submit" color="primary" fullWidth sx={{ mt: 2 }}>
-          Crear Función
-        </Button>
-      </form>
+    <Box p={4}>
+      <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Crear Nueva Función
+        </Typography>
 
-      <Paper sx={{ mt: 4 }}>
-        <Table>
+        <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+          <TextField
+            label="Fecha"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={fecha}
+            onChange={(e) => setFecha(e.target.value)}
+          />
+          <TextField
+            label="Hora"
+            type="time"
+            InputLabelProps={{ shrink: true }}
+            value={hora}
+            onChange={(e) => setHora(e.target.value)}
+          />
+          <TextField
+            label="Sala"
+            select
+            value={salaId}
+            onChange={(e) => setSalaId(e.target.value)}
+          >
+            {salas.map((s) => (
+              <MenuItem key={s.idSalas} value={s.idSalas}>
+                {s.nombre}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="Película"
+            select
+            value={peliculaId}
+            onChange={(e) => setPeliculaId(e.target.value)}
+          >
+            {peliculas.map((p) => (
+              <MenuItem key={p.idPeliculas} value={p.idPeliculas}>
+                {p.titulo}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
+        <Button
+          variant="contained"
+          onClick={handleCrear}
+          sx={{ px: 4, py: 1, borderRadius: 2 }}
+        >
+          CREAR FUNCIÓN
+        </Button>
+      </Paper>
+
+      <Paper elevation={2} sx={{ mt: 4, borderRadius: 3 }}>
+        <Typography variant="h6" sx={{ p: 2 }}>
+          Funciones Registradas
+        </Typography>
+        <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Fecha</TableCell>
-              <TableCell>Hora</TableCell>
-              <TableCell>Sala</TableCell>
-              <TableCell>Película</TableCell>
+              <TableCell><strong>Fecha</strong></TableCell>
+              <TableCell><strong>Hora</strong></TableCell>
+              <TableCell><strong>Sala</strong></TableCell>
+              <TableCell><strong>Película</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {funciones.map((f) => (
-              <TableRow key={f.idfunciones}>
+              <TableRow key={f.id}>
                 <TableCell>{f.fecha}</TableCell>
                 <TableCell>{f.hora}</TableCell>
-                <TableCell>{f.nombreSala}</TableCell>
-                <TableCell>{f.tituloPelicula}</TableCell>
+                <TableCell>{f.sala}</TableCell>
+                <TableCell>{f.pelicula}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Paper>
-    </div>
+    </Box>
   );
 }

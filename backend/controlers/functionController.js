@@ -32,13 +32,26 @@ exports.createFunction = async (req, res) => {
 
 exports.getFunciones = async (req, res) => {
   try {
-    const funciones = await FunctionModel.findAll();
+    const [funciones] = await db.query(
+      `SELECT 
+         f.idfunciones AS id,
+         f.fecha,
+         f.hora,
+         s.nombre AS sala,
+         p.titulo AS pelicula
+       FROM funciones f
+       JOIN salas s ON f.sala_idSalas = s.idSalas
+       JOIN peliculas p ON f.pelicula_idPeliculas = p.idPeliculas
+       ORDER BY f.fecha DESC, f.hora DESC`
+    );
+
     res.json(funciones);
   } catch (error) {
     console.error("Error al obtener funciones:", error);
     res.status(500).json({ message: "Error del servidor" });
   }
 };
+
 
 exports.getFuncionById = async (req, res) => {
   const id = req.params.id;

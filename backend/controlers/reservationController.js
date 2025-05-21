@@ -75,12 +75,58 @@ exports.createReservation = async (req, res) => {
   }
 };
 
-
 exports.getUserReservations = async (req, res) => {
-    try {
-        const reservaciones = await Reservation.getByUser(req.user.id);
-        res.json(reservaciones);
-    } catch (error) {
-        res.status(500).json({ message: "Error al obtener reservaciones", error });
-    }
+  try {
+    const [reservaciones] = await db.query(`
+      SELECT 
+        r.idReservacion,
+        r.estado,
+        f.fecha AS fecha_funcion,
+        f.hora,
+        p.titulo AS pelicula,
+        s.nombre AS sala,
+        GROUP_CONCAT(CONCAT(a.fila, '-', a.columna)) AS asientos
+      FROM reservacion r
+      JOIN funciones f ON r.funcion_idFunciones = f.idfunciones
+      JOIN peliculas p ON f.pelicula_idPeliculas = p.idPeliculas
+      JOIN salas s ON f.sala_idSalas = s.idSalas
+      JOIN asientos a ON r.asiento_idAsientos = a.idasientos
+      WHERE r.usuario_idUsuarios = ?
+      GROUP BY r.idReservacion
+    `, [req.user.id]);
+
+    const resultado = reservaciones.map(r => ({
+      ...r,
+      asientos: r.asientos ? r.asientos.split(",") : []
+    }));
+
+    res.json(resultado);
+  } catch (error) {
+    console.error("❌ ERROR en getUserReservations:", error);
+    res.status(500).json({ message: "Error al obtener reservaciones", error });
+  }
 };
+
+exports.cancelarReserva = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query("UPDATE reservacion SET estado = 'cancelado' WHERE idReservacion = ?", [id]);
+    res.json({ message: "Reserva cancelada correctamente" });
+  } catch (error) {
+    res.status(500).json({ message: "Error al cancelar", error });
+  }
+};
+
+
+
+exports.confirmarPago = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query("UPDATE reservacion SET estado = 'pagado' WHERE idReservacion = ?", [id]);
+    res.json({ message: "Reserva marcada como pagada" });
+  } catch (error) {
+    res.status(500).json({ message: "Error al confirmar pago", error });
+  }
+};
+
+

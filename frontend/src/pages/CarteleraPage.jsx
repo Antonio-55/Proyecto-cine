@@ -7,14 +7,30 @@ import {
   Button,
   CardMedia,
   Alert,
+  Modal,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  maxHeight: "80vh",
+  overflowY: "auto",
+  bgcolor: "background.paper",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 4,
+};
 
 const CarteleraPage = () => {
   const [peliculas, setPeliculas] = useState([]);
   const [funciones, setFunciones] = useState([]);
   const [peliculaSeleccionada, setPeliculaSeleccionada] = useState(null);
   const [errorFunciones, setErrorFunciones] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,6 +51,7 @@ const CarteleraPage = () => {
     setPeliculaSeleccionada(pelicula);
     setErrorFunciones(null);
     setFunciones([]);
+    setModalOpen(true);
 
     try {
       const res = await fetch(
@@ -72,21 +89,29 @@ const CarteleraPage = () => {
 
       <Box display="flex" flexWrap="wrap" justifyContent="flex-start">
         {peliculas.map((pelicula) => (
-          <Box key={pelicula.idPeliculas} maxWidth="300px" m={2}>
-            <Card>
+          <Box
+            key={pelicula.idPeliculas}
+            width="300px"
+            m={2}
+            style={{ height: "100%" }}
+          >
+            <Card style={{ height: "100%", display: "flex", flexDirection: "column" }}>
               <CardMedia
                 component="img"
                 height="400"
                 image={pelicula.poster_url}
                 alt={pelicula.titulo}
               />
-              <CardContent>
+              <CardContent style={{ flexGrow: 1 }}>
                 <Typography variant="h6">{pelicula.titulo}</Typography>
-                <Typography variant="body2" gutterBottom>
+                <Typography variant="body2" gutterBottom noWrap>
                   {pelicula.sinopsis}
                 </Typography>
+              </CardContent>
+              <CardContent>
                 <Button
                   variant="outlined"
+                  fullWidth
                   onClick={() => handleSeleccionarPelicula(pelicula)}
                 >
                   Ver funciones
@@ -97,43 +122,48 @@ const CarteleraPage = () => {
         ))}
       </Box>
 
-      {peliculaSeleccionada && (
-        <>
-          <Typography variant="h5" gutterBottom mt={4}>
-            Funciones disponibles para {peliculaSeleccionada.titulo}
-          </Typography>
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        aria-labelledby="modal-funciones"
+      >
+        <Box sx={modalStyle}>
+          {peliculaSeleccionada && (
+            <>
+              <Typography variant="h6" gutterBottom>
+                Funciones para {peliculaSeleccionada.titulo}
+              </Typography>
 
-          {errorFunciones && (
-            <Alert severity="warning" sx={{ mt: 2, mb: 2 }}>
-              {errorFunciones}
-            </Alert>
+              {errorFunciones ? (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  {errorFunciones}
+                </Alert>
+              ) : (
+                funciones.map((f) => (
+                  <Card key={f.idFuncion} sx={{ mb: 2 }}>
+                    <CardContent>
+                      <Typography>Sala: {f.sala}</Typography>
+                      <Typography>Fecha: {formatFecha(f.fecha)}</Typography>
+                      <Typography>Hora: {f.hora}</Typography>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        sx={{ mt: 1 }}
+                        onClick={() => navigate(`/reservar/${f.idFuncion}`)}
+                      >
+                        Reservar
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+              <Button fullWidth sx={{ mt: 2 }} onClick={() => setModalOpen(false)}>
+                Cerrar
+              </Button>
+            </>
           )}
-
-          <Box display="flex" flexWrap="wrap" justifyContent="flex-start">
-            {funciones.map((f) => (
-              <Box key={f.idFuncion} maxWidth="300px" m={2}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="body1">Sala: {f.sala}</Typography>
-                    <Typography variant="body2">
-                      Fecha: {formatFecha(f.fecha)}
-                    </Typography>
-                    <Typography variant="body2">Hora: {f.hora}</Typography>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      style={{ marginTop: "1rem" }}
-                      onClick={() => navigate(`/reservar/${f.idFuncion}`)}
-                    >
-                      Reservar
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Box>
-            ))}
-          </Box>
-        </>
-      )}
+        </Box>
+      </Modal>
     </div>
   );
 };

@@ -11,6 +11,8 @@ import AdminPanelPage from "./pages/AdminPanelPage";
 import AdminFuncionesPage from "./pages/AdminFuncionesPage";
 import AdminPeliculasPage from "./pages/AdminPeliculasPage";
 import AdminSalasPage from "./pages/AdminSalasPage";
+import AdminPanelTabs from "./pages/AdminPanelTabs";
+
 
 // Protección por rol
 import RutaPrivada from "./components/RutaPrivada";
@@ -44,11 +46,16 @@ function App() {
       } />
 
       {/* Admin */}
-      <Route path="/admin" element={
-        <RutaPrivada rolPermitido="administrador">
-          <AdminPanelPage />
-        </RutaPrivada>
-      } />
+  
+      <Route
+        path="/admin"
+        element={
+          <RutaPrivada rolPermitido="administrador">
+            <AdminPanelTabs />  {/* ✅ el componente correcto con tabs */}
+          </RutaPrivada>
+        }
+      />
+
       <Route path="/admin/funciones" element={
         <RutaPrivada rolPermitido="administrador">
           <AdminFuncionesPage />

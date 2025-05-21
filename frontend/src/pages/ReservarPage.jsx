@@ -58,7 +58,7 @@ const ReservarPage = () => {
           state: {
             funcion,
             asientosSeleccionados,
-            reservacionIds: data.ids,
+            idsReservaciones: data.ids, // ✅ nombre corregido
             total: asientosSeleccionados.length * 47,
           },
         });
@@ -219,7 +219,22 @@ const ReservarPage = () => {
         </Box>
       </Box>
 
-      <Box mt={3}>
+      {/* RESUMEN */}
+      {asientosSeleccionados.length > 0 && (
+        <Box mt={4} textAlign="center">
+          <Typography variant="h6" gutterBottom color={palette.text}>
+            Asientos seleccionados:
+          </Typography>
+          <Typography variant="body1" color={palette.primary}>
+            {asientosSeleccionados.map(a => `${String.fromCharCode(64 + a.fila)}${a.columna}`).join(", ")}
+          </Typography>
+          <Typography variant="body1" mt={2} color={palette.text}>
+            Total a pagar: <strong>Q{asientosSeleccionados.length * 47}.00</strong>
+          </Typography>
+        </Box>
+      )}
+
+      <Box mt={3} textAlign="center">
         <Button
           variant="contained"
           sx={{ backgroundColor: palette.success }}
