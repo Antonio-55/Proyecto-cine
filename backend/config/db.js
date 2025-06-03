@@ -8,11 +8,11 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
-const db = pool.promise(); // ✅ importante para await
+const db = pool.promise(); 
 
-// Solo para mensaje en consola (opcional)
+// Solo para mensaje en consola 
 db.getConnection()
-  .then(() => console.log("✅ Conectado a la base de datos MySQL"))
-  .catch((err) => console.error("❌ Error conectando a MySQL:", err));
+  .then(() => console.log(" Conectado a la base de datos MySQL"))
+  .catch((err) => console.error(" Error conectando a MySQL:", err));
 
 module.exports = db;

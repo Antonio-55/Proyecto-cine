@@ -40,9 +40,19 @@ export default function AdminPanelTabs() {
       >
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="h4">Panel de Administración</Typography>
-          <Button variant="contained" color="error" onClick={handleLogout}>
-            Cerrar Sesión
-          </Button>
+          <Box>
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ mr: 2 }}
+              onClick={() => navigate("/admin/reporte")}
+            >
+              Ver Reporte 📊
+            </Button>
+            <Button variant="contained" color="error" onClick={handleLogout}>
+              Cerrar Sesión
+            </Button>
+          </Box>
         </Box>
 
         <AppBar

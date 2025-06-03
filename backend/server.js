@@ -40,3 +40,7 @@ app.use("/api/payments", paymentRoutes);
 const asientoRoutes = require("./routes/asientoRoutes");
 app.use("/api", asientoRoutes); 
 
+const adminRoutes = require('./routes/adminRoutes');
+
+app.use('/api/admin', adminRoutes);
+

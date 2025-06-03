@@ -12,6 +12,8 @@ import AdminFuncionesPage from "./pages/AdminFuncionesPage";
 import AdminPeliculasPage from "./pages/AdminPeliculasPage";
 import AdminSalasPage from "./pages/AdminSalasPage";
 import AdminPanelTabs from "./pages/AdminPanelTabs";
+import AdminReportPage from "./pages/AdminReportPage";
+
 
 
 // Protección por rol
@@ -46,12 +48,15 @@ function App() {
       } />
 
       {/* Admin */}
+
+      <Route path="/admin/reporte" element={<AdminReportPage />} />
+
   
       <Route
         path="/admin"
         element={
           <RutaPrivada rolPermitido="administrador">
-            <AdminPanelTabs />  {/* ✅ el componente correcto con tabs */}
+            <AdminPanelTabs />  {/*  */}
           </RutaPrivada>
         }
       />

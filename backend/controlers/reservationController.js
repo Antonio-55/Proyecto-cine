@@ -3,8 +3,7 @@ const Asiento = require("../models/Asiento");
 const db = require("../config/db");
 
 exports.createReservation = async (req, res) => {
-  console.log("📨 Backend recibió:", req.body);
-
+  
   const { funcionId, asientos, fecha } = req.body;
 
   if (!funcionId || !Array.isArray(asientos) || asientos.length === 0 || !fecha) {
